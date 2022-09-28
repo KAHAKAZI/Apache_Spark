@@ -52,6 +52,17 @@ public class Main {
         JavaRDD<Double> sqrtRDD = myRDD.map(value -> Math.sqrt(value));
         sqrtRDD.foreach(value -> System.out.println(value));
 
+        /*
+            count
+         */
+        System.out.println("count: " + sqrtRDD.count());
+
+        /*
+            count using map and reduce
+         */
+        Long countResult = myRDD.map(value -> 1L).reduce((value1, value2) -> value1 + value2);
+        System.out.println("map reduce count: " + countResult);
+
         sc.close();
     }
 }
