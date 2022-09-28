@@ -35,33 +35,38 @@ public class Main {
             loading data and turning it into RDD - in reality not loaded but added to the execution plan
             the data would be loaded when performing some operations on it
          */
-        JavaRDD<Integer> myRDD = sc.parallelize(inputData);
-
+        JavaRDD<Integer> originalIntegers = sc.parallelize(inputData);
 
         /*
             reduce - has to return the same type as the input type
 
             the below syntax can be replaced with myRDD.reduce(Double::sum)
          */
-        Integer result = myRDD.reduce( (value1, value2) -> value1 + value2 );
-        System.out.println(result);
+//        Integer result = myRDD.reduce( (value1, value2) -> value1 + value2 );
+//        System.out.println(result);
 
         /*
             mapping values
          */
-        JavaRDD<Double> sqrtRDD = myRDD.map(value -> Math.sqrt(value));
-        sqrtRDD.collect().forEach(System.out::println);
+//        JavaRDD<Double> sqrtRDD = originalIntegers.map(value -> Math.sqrt(value));
+//        sqrtRDD.collect().forEach(System.out::println);
 
         /*
             count
          */
-        System.out.println("count: " + sqrtRDD.count());
+//        System.out.println("count: " + sqrtRDD.count());
 
         /*
             count using map and reduce
          */
-        Long countResult = myRDD.map(value -> 1L).reduce((value1, value2) -> value1 + value2);
-        System.out.println("map reduce count: " + countResult);
+//        Long countResult = myRDD.map(value -> 1L).reduce((value1, value2) -> value1 + value2);
+//        System.out.println("map reduce count: " + countResult);
+
+        /*
+            Tuples by means of classic Java
+         */
+        JavaRDD<IntegerWithSquareRoot> sqrtRDD = originalIntegers.map(value -> new IntegerWithSquareRoot(value));
+        sqrtRDD.foreach(v -> System.out.println(v));
 
         sc.close();
     }

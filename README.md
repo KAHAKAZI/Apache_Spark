@@ -17,11 +17,17 @@
   * streams
   * apache kafka
 
+-------------------------------------------------------------
 ### Functions:
 * reduce
 * map
 * count
 
+### Tuples 
+* allow to keep data together
+* a data structure consisting of multiple parts. 
+* Hence Tuples can be defined as a data structure that can hold multiple values and these values may/may not be related to each other 
+* example: [Geeks, 123, &#*@]
 
 -------------------------------------------------------------
 ### Abbreviations:
