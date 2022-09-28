@@ -33,6 +33,11 @@
 #### Scala implementation of Tuple
 * new Tuple2() up to new Tuple22()
 
+### JavaPairRDD
+* allows multiple instances of the same key, something what is forbidden in Java Map<>
+* groupByKey() does not allow to count the aggregated values
+* reduceByKey()
+
 -------------------------------------------------------------
 ### Abbreviations:
 * RDD Resilient Distributed Dataset
