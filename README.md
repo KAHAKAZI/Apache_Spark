@@ -24,10 +24,14 @@
 * count
 
 ### Tuples 
+* a collection of values that are not planned to be modified
 * allow to keep data together
 * a data structure consisting of multiple parts. 
 * Hence Tuples can be defined as a data structure that can hold multiple values and these values may/may not be related to each other 
 * example: [Geeks, 123, &#*@]
+
+#### Scala implementation of Tuple
+* new Tuple2() up to new Tuple22()
 
 -------------------------------------------------------------
 ### Abbreviations:

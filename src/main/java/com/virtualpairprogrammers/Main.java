@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,12 @@ public class Main {
          */
         JavaRDD<IntegerWithSquareRoot> sqrtRDD = originalIntegers.map(value -> new IntegerWithSquareRoot(value));
         sqrtRDD.foreach(v -> System.out.println(v));
+
+        /*
+            Scala Tuple2 type
+         */
+        JavaRDD<Tuple2<Integer, Double>> sqrtRDDTuple = originalIntegers.map(value -> new Tuple2(value, Math.sqrt(value)));
+        sqrtRDDTuple.collect().forEach(System.out::println);
 
         sc.close();
     }
