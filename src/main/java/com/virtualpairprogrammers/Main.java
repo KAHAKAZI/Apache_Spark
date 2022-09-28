@@ -50,7 +50,7 @@ public class Main {
             mapping values
          */
         JavaRDD<Double> sqrtRDD = myRDD.map(value -> Math.sqrt(value));
-        sqrtRDD.foreach(value -> System.out.println(value));
+        sqrtRDD.collect().forEach(System.out::println);
 
         /*
             count
