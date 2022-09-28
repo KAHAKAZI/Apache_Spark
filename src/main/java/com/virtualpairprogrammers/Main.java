@@ -12,11 +12,11 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        List<Double> inputData = new ArrayList<>();
-        inputData.add(35.5);
-        inputData.add(12.49937);
-        inputData.add(90.32);
-        inputData.add(20.32);
+        List<Integer> inputData = new ArrayList<>();
+        inputData.add(35);
+        inputData.add(12);
+        inputData.add(90);
+        inputData.add(20);
 
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
@@ -35,7 +35,7 @@ public class Main {
             loading data and turning it into RDD - in reality not loaded but added to the execution plan
             the data would be loaded when performing some operations on it
          */
-        JavaRDD<Double> myRDD = sc.parallelize(inputData);
+        JavaRDD<Integer> myRDD = sc.parallelize(inputData);
 
 
         /*
@@ -43,9 +43,14 @@ public class Main {
 
             the below syntax can be replaced with myRDD.reduce(Double::sum)
          */
-        Double result = myRDD.reduce( (value1, value2) -> value1 + value2 );
-
+        Integer result = myRDD.reduce( (value1, value2) -> value1 + value2 );
         System.out.println(result);
+
+        /*
+            mapping values
+         */
+        JavaRDD<Double> sqrtRDD = myRDD.map(value -> Math.sqrt(value));
+        sqrtRDD.foreach(value -> System.out.println(value));
 
         sc.close();
     }
