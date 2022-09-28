@@ -37,6 +37,16 @@ public class Main {
          */
         JavaRDD<Double> myRDD = sc.parallelize(inputData);
 
+
+        /*
+            reduce - has to return the same type as the input type
+
+            the below syntax can be replaced with myRDD.reduce(Double::sum)
+         */
+        Double result = myRDD.reduce( (value1, value2) -> value1 + value2 );
+
+        System.out.println(result);
+
         sc.close();
     }
 }
