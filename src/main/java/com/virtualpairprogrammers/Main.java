@@ -102,7 +102,15 @@ public class Main {
         });
 
         JavaPairRDD<String, Long> sumsRDD = pairRDDCounts.reduceByKey((value1, value2) -> value1 + value2);
-        sumsRDD.foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
+//        sumsRDD.foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
+
+        /*
+            simplification of steps
+         */
+        sc.parallelize(inputData).mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+                .reduceByKey((value1, value2) -> value1 + value2)
+                .foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
+
 
         sc.close();
     }
