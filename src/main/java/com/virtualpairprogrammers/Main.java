@@ -1,5 +1,6 @@
 package com.virtualpairprogrammers;
 
+import com.google.common.collect.Iterables;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -88,8 +89,12 @@ public class Main {
 
         /*
             groupByKey may lead to severe performance problems so use only when neccessary
+            returns: PairRDD<String, Iterable<String>> which does not allow to count values
          */
 //        pairRDD.groupByKey();
+        sc.parallelize(inputData).mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+                .groupByKey()
+                .foreach( tuple -> System.out.println(tuple._1 + " has " + Iterables.size(tuple._2) + " instances"));
 
         // ------------------------------------------------
 
