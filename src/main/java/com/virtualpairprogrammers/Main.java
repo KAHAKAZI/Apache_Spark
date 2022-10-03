@@ -128,6 +128,16 @@ public class Main {
                 .filter( word -> word.length() > 1)
                 .collect().forEach(System.out::println);
 
+        /*
+            Reading from a file
+         */
+        System.out.println("\nReading from a file - FlatMap:");
+//        JavaRDD<String> initialRDD = sc.textFile("s3://");  // reading from an Amazon S3
+        JavaRDD<String> initialRDD = sc.textFile("src/main/resources/subtitles/input.txt");
+        initialRDD.flatMap(value -> Arrays.asList(value.split(" ")).iterator())
+                .filter( word -> word.length() > 1)
+                .collect().forEach(System.out::println);
+
         sc.close();
     }
 }
