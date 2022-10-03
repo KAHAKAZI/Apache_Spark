@@ -120,10 +120,13 @@ public class Main {
         /*
             flatMap
          */
-        JavaRDD<String> sentences = sc.parallelize(inputData);
-        JavaRDD<String> words = sentences.flatMap(value -> Arrays.asList(value.split(" ")).iterator());
         System.out.println("\nFlatMap:");
-        words.collect().forEach(System.out::println);
+        sc.parallelize(inputData)
+                .flatMap(value -> Arrays.asList(value.split(" ")).iterator())
+//                .filter( word -> true);   // pass all
+//                .filter( word -> false);    // pass none
+                .filter( word -> word.length() > 1)
+                .collect().forEach(System.out::println);
 
         sc.close();
     }
