@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -116,6 +117,13 @@ public class Main {
                 .reduceByKey((value1, value2) -> value1 + value2)
                 .foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
 
+        /*
+            flatMap
+         */
+        JavaRDD<String> sentences = sc.parallelize(inputData);
+        JavaRDD<String> words = sentences.flatMap(value -> Arrays.asList(value.split(" ")).iterator());
+        System.out.println("\nFlatMap:");
+        words.collect().forEach(System.out::println);
 
         sc.close();
     }

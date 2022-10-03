@@ -38,6 +38,8 @@
 * groupByKey() does not allow to count the aggregated values
 * reduceByKey()
 
+### FlatMap
+
 -------------------------------------------------------------
 ### Abbreviations:
 * RDD Resilient Distributed Dataset
