@@ -24,6 +24,11 @@ public class Main {
         inputData.add("ERROR: Friday 7 September 1854");
         inputData.add("WARN: Saturday 8 September 1942");
 
+        /*
+            setting Hadoop path instead of system environment
+         */
+//        System.setProperty("hadoop.home.dir", "/home/christopher/hadoop");
+
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
         /*
