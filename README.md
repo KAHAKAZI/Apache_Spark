@@ -2,6 +2,12 @@
 
 [Udemy - Spark for Java Developers](https://www.udemy.com/course/apache-spark-for-java-developers)
 
+[RDD Programming Guide](https://spark.apache.org/docs/latest/rdd-programming-guide.html)
+* Resilient Distributed Datasets (RDDs) -> RDD Operations
+  * [Transformactions](https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations)
+  * [Actions](https://spark.apache.org/docs/latest/rdd-programming-guide.html#actions)
+
+
 -------------------------------------------------------------
 ### Requirements:
 * JDK 8 ( no support for JDK 9 )
