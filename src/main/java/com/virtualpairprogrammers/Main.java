@@ -8,7 +8,6 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -139,9 +138,56 @@ public class Main {
         System.out.println("\nReading from a file - FlatMap:");
 //        JavaRDD<String> initialRDD = sc.textFile("s3://");  // reading from an Amazon S3
         JavaRDD<String> initialRDD = sc.textFile("src/main/resources/subtitles/input.txt");
+//        initialRDD.flatMap(value -> Arrays.asList(value.split(" ")).iterator())
+//                .filter( word -> word.length() > 1)
+//                .collect().forEach(System.out::println);
+
+        /*
+            Task
+            1. Load input.txt into an RDD
+            2. Get rid of boring words
+            3. Count remaining words
+            4. Find the ten most frequently used
+         */
+        System.out.println("\nTask:");
         initialRDD.flatMap(value -> Arrays.asList(value.split(" ")).iterator())
-                .filter( word -> word.length() > 1)
-                .collect().forEach(System.out::println);
+                .filter(Util::isNotBoring)
+                .mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+                .reduceByKey((value1, value2) -> value1 + value2)
+                .groupByKey()
+                .mapToPair(tuple -> new Tuple2<>(tuple._2.iterator().next(), tuple._1))
+                .map(tuple -> new CustomTuple(tuple._1, tuple._2))
+                .sortBy(value -> value, false, 1)
+                .top(10).forEach(System.out::println);
+
+        /*
+            Solution from the course
+            Regex: [^a-zA-Z\\s] : replace anything that is not in that range: a-z, A-Z, space
+         */
+        System.out.println("\nTask solution:");
+        JavaRDD<String> lettersOnlyRdd = initialRDD
+                .map(sentence -> sentence
+                .replaceAll("[^a-zA-Z\\s]", "")
+                .toLowerCase());
+
+        JavaRDD<String> removedBlankLines = lettersOnlyRdd.filter(sentence -> sentence.trim().length() > 0);
+
+        JavaRDD<String> justWords = removedBlankLines.flatMap(sentence -> Arrays.asList(sentence.split(" ")).iterator());
+
+        JavaRDD<String> blankWordsRemoved = justWords.filter(word -> word.trim().length() > 0);
+
+        JavaRDD<String> justInterestingWords = blankWordsRemoved.filter(Util::isNotBoring);
+
+        JavaPairRDD<String, Long> pairRdd = justInterestingWords.mapToPair(word -> new Tuple2<String, Long>(word, 1L));
+
+        JavaPairRDD<String, Long> totals = pairRdd.reduceByKey((value1, value2) -> value1 + value2);
+
+        JavaPairRDD<Long,String> switched = totals.mapToPair(tuple -> new Tuple2<>(tuple._2, tuple._1));
+
+        JavaPairRDD<Long,String> sorted = switched.sortByKey(false);
+
+        List<Tuple2<Long, String>> results = sorted.take(10);
+        results.forEach(System.out::println);
 
         sc.close();
     }
