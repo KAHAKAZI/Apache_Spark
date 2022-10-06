@@ -151,6 +151,8 @@ public class Main {
          */
         System.out.println("\nTask:");
         initialRDD.flatMap(value -> Arrays.asList(value.split(" ")).iterator())
+                .map(sentence -> sentence.replaceAll("[^a-zA-Z\\s]", "").toLowerCase())
+                .filter(sentence -> sentence.trim().length() > 0)
                 .filter(Util::isNotBoring)
                 .mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
                 .reduceByKey((value1, value2) -> value1 + value2)
@@ -165,10 +167,7 @@ public class Main {
             Regex: [^a-zA-Z\\s] : replace anything that is not in that range: a-z, A-Z, space
          */
         System.out.println("\nTask solution:");
-        JavaRDD<String> lettersOnlyRdd = initialRDD
-                .map(sentence -> sentence
-                .replaceAll("[^a-zA-Z\\s]", "")
-                .toLowerCase());
+        JavaRDD<String> lettersOnlyRdd = initialRDD.map(sentence -> sentence.replaceAll("[^a-zA-Z\\s]", "").toLowerCase());
 
         JavaRDD<String> removedBlankLines = lettersOnlyRdd.filter(sentence -> sentence.trim().length() > 0);
 
