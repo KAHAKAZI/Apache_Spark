@@ -10,6 +10,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Main {
@@ -185,8 +186,37 @@ public class Main {
 
         JavaPairRDD<Long,String> sorted = switched.sortByKey(false);
 
-        List<Tuple2<Long, String>> results = sorted.take(10);
-        results.forEach(System.out::println);
+        /*
+            take() takes top values regardless of partitioning
+         */
+//        List<Tuple2<Long, String>> results = sorted.take(10);
+//        results.forEach(System.out::println);
+
+        /*
+            Simple but wrong explanation:
+            The sort result in this case is incorrect because the data is sorted in partitions, not as a whole collection
+
+            Explanation:
+            forEach() / foreach() takes in PARALLEL values from partitions and prints them in different order, multithreading comes here into an account
+            foreach() / forEach() executes the lambda on each partition in parallel
+         */
+//        sorted.collect().forEach(System.out::println);
+
+        /*
+            Printing sorted values not by means of faulty foreach()
+         */
+        Iterator it = sorted.collect().iterator();
+        while (it.hasNext())
+            System.out.println(it.next());
+        System.out.println("Partitions: "+ sorted.getNumPartitions());
+
+        /*
+            coalesce() :
+            * is sufficient only for small data
+            * it created new big RDD and allows further operations
+            * the result may be OutOfMemory
+         */
+//        sorted.coalesce(1).collect().stream().limit(10).forEach(System.out::println);
 
         sc.close();
     }

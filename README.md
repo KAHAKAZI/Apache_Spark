@@ -46,6 +46,11 @@
 
 ### FlatMap
 
+### Sorts and coalesce
+* take() takes top values regardless of partitioning
+* foreach() / forEach() executes the lambda on each partition in parallel so it may produce wrong results in case of sorted data
+
+
 -------------------------------------------------------------
 ### Abbreviations:
 * RDD Resilient Distributed Dataset
