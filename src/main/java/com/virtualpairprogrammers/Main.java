@@ -85,53 +85,53 @@ public class Main {
 //        JavaRDD<Tuple2<Integer, Double>> sqrtRDDTuple = originalStrings.map(value -> new Tuple2(value, Math.sqrt(value)));
 //        sqrtRDDTuple.collect().forEach(System.out::println);
 
-        JavaPairRDD<String, String> pairRDD = originalLogMessages.mapToPair(rawValue -> {
-            String[] columns = rawValue.split(":");
-            String level = columns[0];
-            String date = columns[1];
-
-            return new Tuple2<>(level, date);
-        });
+//        JavaPairRDD<String, String> pairRDD = originalLogMessages.mapToPair(rawValue -> {
+//            String[] columns = rawValue.split(":");
+//            String level = columns[0];
+//            String date = columns[1];
+//
+//            return new Tuple2<>(level, date);
+//        });
 
         /*
             groupByKey may lead to severe performance problems so use only when neccessary
             returns: PairRDD<String, Iterable<String>> which does not allow to count values
          */
 //        pairRDD.groupByKey();
-        sc.parallelize(inputData).mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
-                .groupByKey()
-                .foreach( tuple -> System.out.println(tuple._1 + " has " + Iterables.size(tuple._2) + " instances"));
+//        sc.parallelize(inputData).mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+//                .groupByKey()
+//                .foreach( tuple -> System.out.println(tuple._1 + " has " + Iterables.size(tuple._2) + " instances"));
 
         // ------------------------------------------------
 
-        JavaPairRDD<String, Long> pairRDDCounts = originalLogMessages.mapToPair(rawValue -> {
-            String[] columns = rawValue.split(":");
-            String level = columns[0];
-//            Long count = columns[1];
+//        JavaPairRDD<String, Long> pairRDDCounts = originalLogMessages.mapToPair(rawValue -> {
+//            String[] columns = rawValue.split(":");
+//            String level = columns[0];
+////            Long count = columns[1];
+//
+//            return new Tuple2<>(level, 1L);
+//        });
 
-            return new Tuple2<>(level, 1L);
-        });
-
-        JavaPairRDD<String, Long> sumsRDD = pairRDDCounts.reduceByKey((value1, value2) -> value1 + value2);
+//        JavaPairRDD<String, Long> sumsRDD = pairRDDCounts.reduceByKey((value1, value2) -> value1 + value2);
 //        sumsRDD.foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
 
         /*
             simplification of steps
          */
-        sc.parallelize(inputData).mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
-                .reduceByKey((value1, value2) -> value1 + value2)
-                .foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
+//        sc.parallelize(inputData).mapToPair(rawValue -> new Tuple2<>(rawValue.split(":")[0], 1L))
+//                .reduceByKey((value1, value2) -> value1 + value2)
+//                .foreach(tuple -> System.out.println(tuple._1 + ", "+ tuple._2));
 
         /*
             flatMap
          */
-        System.out.println("\nFlatMap:");
-        sc.parallelize(inputData)
-                .flatMap(value -> Arrays.asList(value.split(" ")).iterator())
-//                .filter( word -> true);   // pass all
-//                .filter( word -> false);    // pass none
-                .filter( word -> word.length() > 1)
-                .collect().forEach(System.out::println);
+//        System.out.println("\nFlatMap:");
+//        sc.parallelize(inputData)
+//                .flatMap(value -> Arrays.asList(value.split(" ")).iterator())
+////                .filter( word -> true);   // pass all
+////                .filter( word -> false);    // pass none
+//                .filter( word -> word.length() > 1)
+//                .collect().forEach(System.out::println);
 
         /*
             Reading from a file
@@ -189,8 +189,8 @@ public class Main {
         /*
             take() takes top values regardless of partitioning
          */
-//        List<Tuple2<Long, String>> results = sorted.take(10);
-//        results.forEach(System.out::println);
+        List<Tuple2<Long, String>> results = sorted.take(10);
+        results.forEach(System.out::println);
 
         /*
             Simple but wrong explanation:
@@ -205,10 +205,10 @@ public class Main {
         /*
             Printing sorted values not by means of faulty foreach()
          */
-        Iterator it = sorted.collect().iterator();
-        while (it.hasNext())
-            System.out.println(it.next());
-        System.out.println("Partitions: "+ sorted.getNumPartitions());
+//        Iterator it = sorted.collect().iterator();
+//        while (it.hasNext())
+//            System.out.println(it.next());
+//        System.out.println("Partitions: "+ sorted.getNumPartitions());
 
         /*
             coalesce() :
@@ -217,6 +217,8 @@ public class Main {
             * the result may be OutOfMemory
          */
 //        sorted.coalesce(1).collect().stream().limit(10).forEach(System.out::println);
+
+
 
         sc.close();
     }
