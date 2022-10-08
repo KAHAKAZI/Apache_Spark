@@ -50,6 +50,25 @@
 * take() takes top values regardless of partitioning
 * foreach() / forEach() executes the lambda on each partition in parallel so it may produce wrong results in case of sorted data
 
+### S11. Deploying to EMR ( Elastic MapReduce )
+* Spark supports the Hadoop cluster manager
+* Hadoop is a collection of tools, one of which is EMR, HDFS filesystem, and cluster manager Hadoop YARN
+* EMR is basically Amazon's implementation of Hadoop in the Cloud
+* [Amazon EC2 On-Demand Pricing](https://aws.amazon.com/ec2/pricing/on-demand/)
+  * m6g.xlarge 
+* To read file in Spark application using AWS create [Amazon S3](https://s3.console.aws.amazon.com/s3), create a bucket and upload the file
+* To build an application to get it ready for deployment run`mvn package`
+* Enable SSH connection: In EMR -> Security and access -> Security groups for Master -> Master group -> Inbounds rules -> Edit -> Add rule
+  * Port 18080 MyIP
+  * Port 22 MyIP
+* SSH to the instance:
+```
+  chmod 700 <your_key.pem>
+  ssh -i <your_key.pem> hadoop@<Master_public_DNS>
+```
+ended at S11.28
+
+
 
 -------------------------------------------------------------
 ### Abbreviations:

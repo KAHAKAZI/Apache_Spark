@@ -35,7 +35,12 @@ public class Main {
             .setMaster("local[*]") is a performance remark which means "use all available cores on the machine"
             .setMaster("local") would mean "run on a single thread"
          */
-        SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
+//        SparkConf conf = new SparkConf().setAppName("startingSpark").setMaster("local[*]");
+
+        /*
+            Conf for EMR
+         */
+        SparkConf conf = new SparkConf().setAppName("startingSpark");
 
         /*
             JavaSparkContext represents a connection to a Spark cluster
@@ -137,8 +142,8 @@ public class Main {
             Reading from a file
          */
         System.out.println("\nReading from a file - FlatMap:");
-//        JavaRDD<String> initialRDD = sc.textFile("s3://");  // reading from an Amazon S3
-        JavaRDD<String> initialRDD = sc.textFile("src/main/resources/subtitles/input.txt");
+        JavaRDD<String> initialRDD = sc.textFile("s3n://custom-named-location/input.txt");  // reading from an Amazon S3
+//        JavaRDD<String> initialRDD = sc.textFile("src/main/resources/subtitles/input.txt");
 //        initialRDD.flatMap(value -> Arrays.asList(value.split(" ")).iterator())
 //                .filter( word -> word.length() > 1)
 //                .collect().forEach(System.out::println);
