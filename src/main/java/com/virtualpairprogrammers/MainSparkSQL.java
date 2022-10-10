@@ -7,11 +7,6 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import scala.Tuple2;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,7 +132,22 @@ public class MainSparkSQL {
 //        spark.sql("select level, date_format(datetime, 'MMMM') as month from logging_table").show();
         Dataset<Row> levelAndMonth = spark.sql("select level, date_format(datetime, 'MMMM') as month from logging_table");
         Dataset<Row> levelAndMonthAndCount = spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) from logging_table group by level, month");
-        levelAndMonthAndCount.show();
+//        levelAndMonthAndCount.show();
+
+        /*
+            Multiple grouping
+         */
+        levelAndMonth.createOrReplaceTempView("logging_table_level_and_month");
+//        spark.sql("select level, month, count(month) as cnt from logging_table_level_and_month group by level, month").show();
+
+        Dataset<Row> bigLog = spark.read().option("header", "true").csv("src/main/resources/extras/biglog.txt");
+        bigLog.createOrReplaceTempView("big_log");
+        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as cnt from big_log group by level, month").show();
+        System.out.println("\nTotal levels:");
+        spark.sql("select sum(level) from big_log").show();
+        System.out.println("\nTotal datetimes:");
+        spark.sql("select sum(datetime) from big_log").show();
+
 
 
         spark.close();
