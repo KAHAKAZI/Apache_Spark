@@ -84,10 +84,18 @@ public class MainSparkSQL {
         Dataset<Row> modernArtResults = dataset.filter(subjectColumn.equalTo("Modern Art")
                 .and(yearColumn.geq("2007")
                 .and(scoreColumn.geq("70"))));
-        modernArtResults.show();
+//        modernArtResults.show();
 
 
         //--------------------------------------------------------------------------------------------
+        // Full SQL syntax
+        /*
+            create in-memory view
+         */
+        dataset.createOrReplaceTempView("my_students_view");
+        Dataset<Row> frenchResults = spark.sql("select * from my_students_view where subject='French'");
+        frenchResults.show();
+
 
 
         spark.close();
