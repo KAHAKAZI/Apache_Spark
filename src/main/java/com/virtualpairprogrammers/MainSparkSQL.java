@@ -55,9 +55,14 @@ public class MainSparkSQL {
         int yearInt = Integer.parseInt(firstRow.getAs("year"));
         System.out.println(yearInt);
 
+        /*
+            Filtering - expressions
+         */
 //        Dataset<Row> modernArtResults = dataset.filter("subject = 'Modern Art'");
 //        Dataset<Row> modernArtResults = dataset.filter("subject = 'Modern Art' AND year >= 2007");
+
         /*
+            Filtering - lambdas
             ?
             Task not serializable
             Caused by: java.io.NotSerializableException: com.virtualpairprogrammers.MainSparkSQL
@@ -67,6 +72,9 @@ public class MainSparkSQL {
 //                        Integer.parseInt(row.getAs("year")) >= 2007);
 //        modernArtResults.collectAsList().forEach(System.out::println);
 
+        /*
+            Filtering - columns
+         */
         Column subjectColumn = dataset.col("subject");
         Column yearColumn = dataset.col("year");
         /*
