@@ -7,7 +7,11 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import scala.Tuple2;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,8 +122,22 @@ public class MainSparkSQL {
         };
         StructType schema = new StructType(fields);
         Dataset<Row> dataset1 = spark.createDataFrame(inMemory, schema);
-        dataset1.show();
+//        dataset1.show();
 
+        dataset1.createOrReplaceTempView("logging_table");
+//        spark.sql("select level, count(datetime) from logging_table group by level").show();
+//        spark.sql("select level, collect_list(datetime) from logging_table group by level").show();
+
+
+        /*
+            Date time format
+         */
+//        spark.sql("select level, month(datetime) from logging_table").show();
+//        spark.sql("select level, date_format(datetime, 'M') as month from logging_table").show();
+//        spark.sql("select level, date_format(datetime, 'MMMM') as month from logging_table").show();
+        Dataset<Row> levelAndMonth = spark.sql("select level, date_format(datetime, 'MMMM') as month from logging_table");
+        Dataset<Row> levelAndMonthAndCount = spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) from logging_table group by level, month");
+        levelAndMonthAndCount.show();
 
 
         spark.close();
