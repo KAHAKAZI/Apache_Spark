@@ -72,6 +72,7 @@ ended at S11.28
 
 * SparkSQL gives rich API to work with structured big data
 * Dataset is immutable like RDD
+* Dataframe is a Dataset of rows.
 
 
 
