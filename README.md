@@ -7,6 +7,8 @@
   * [Transformactions](https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations)
   * [Actions](https://spark.apache.org/docs/latest/rdd-programming-guide.html#actions)
 
+[Spark SQL, Built-in Functions](https://spark.apache.org/docs/latest/api/sql/index.html)
+
 
 -------------------------------------------------------------
 ### Requirements:
@@ -68,7 +70,7 @@
 ```
 ended at S11.28
 
-# Spark SQL
+## Spark SQL
 
 * SparkSQL gives rich API to work with structured big data
 * Dataset is immutable like RDD
