@@ -56,7 +56,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.virtualpairprogrammers.Main</mainClass>
+							<mainClass>com.virtualpairprogrammers.MainRdd</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
