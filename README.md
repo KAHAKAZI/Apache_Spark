@@ -71,7 +71,7 @@ ended at S11.28
 # Spark SQL
 
 * SparkSQL gives rich API to work with structured big data
-
+* Dataset is immutable like RDD
 
 
 

@@ -56,7 +56,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.virtualpairprogrammers.MainRdd</mainClass>
+							<mainClass>com.virtualpairprogrammers.MainSparkSQL</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
