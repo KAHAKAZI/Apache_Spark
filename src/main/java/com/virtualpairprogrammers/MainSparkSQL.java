@@ -9,6 +9,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import java.util.ArrayList;
 import java.util.List;
+import static org.apache.spark.sql.functions.*;
 
 public class MainSparkSQL {
 
@@ -86,7 +87,7 @@ public class MainSparkSQL {
         /*
             usage of static method from 'functions' class
          */
-        Column scoreColumn = functions.column("score");
+        Column scoreColumn = column("score");
 //        Dataset<Row> modernArtResults = dataset.filter(subjectColumn.equalTo("Modern Art")
 //                .and(yearColumn.geq("2007")
 //                .and(scoreColumn.geq("70"))));
@@ -154,13 +155,29 @@ public class MainSparkSQL {
          */
 //        System.out.println("\nOrdered by means of SQL:");
 //        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as cnt from big_log group by level, month order by cnt desc").show();
-        System.out.println("\nOrdered by means of Spark API:");
-        spark.sql("select level, date_format(datetime, 'MMMM') as month, cast(first(date_format(datetime, 'M')) as int) as month_num, count(1) as cnt from big_log group by level, month")
-                .orderBy(functions.col("month_num"))
-                .orderBy(functions.col("level"))
-                .drop("month_num") // drop 'month_num' column from the results
-                .show(100);
+//        System.out.println("\nOrdered by means of Spark API:");
+//        spark.sql("select level, date_format(datetime, 'MMMM') as month, cast(first(date_format(datetime, 'M')) as int) as month_num, count(1) as cnt from big_log group by level, month")
+//                .orderBy(functions.col("month_num"))
+//                .orderBy(functions.col("level"))
+//                .drop("month_num") // drop 'month_num' column from the results
+//                .show(100);
 
+        /*
+            Pure Java DataFrames / Datasets API
+         */
+        System.out.println("\nDataFrames:");
+//        bigLog.select("level", "date_format(datetime, 'M')").show(); // won't work
+//        bigLog.selectExpr("level", "date_format(datetime, 'MMMM') as month").show();
+        bigLog = bigLog.select(col("level"), date_format(col("datetime"), "MMMM").as("month"), date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
+//        bigLog.show();
+
+        // DataFrame grouping
+        System.out.println("\nDataFrames grouping:");
+        bigLog.groupBy(col("level"), col("month"), col("monthnum"))
+                .count()
+                .orderBy(col("monthnum"), col("level"))
+                .drop("monthnum")
+                .show();
 
 
         spark.close();
