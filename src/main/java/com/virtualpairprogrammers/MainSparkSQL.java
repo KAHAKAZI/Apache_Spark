@@ -142,11 +142,24 @@ public class MainSparkSQL {
 
         Dataset<Row> bigLog = spark.read().option("header", "true").csv("src/main/resources/extras/biglog.txt");
         bigLog.createOrReplaceTempView("big_log");
-        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as cnt from big_log group by level, month").show();
-        System.out.println("\nTotal levels:");
-        spark.sql("select sum(level) from big_log").show();
-        System.out.println("\nTotal datetimes:");
-        spark.sql("select sum(datetime) from big_log").show();
+//        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as cnt from big_log group by level, month").show();
+//        System.out.println("\nTotal levels:");
+//        spark.sql("select sum(level) from big_log").show();
+//        System.out.println("\nTotal datetimes:");
+//        spark.sql("select sum(datetime) from big_log").show();
+
+        /*
+            Ordering
+            date_format() uses String type so to order it correctly use cast() to int
+         */
+//        System.out.println("\nOrdered by means of SQL:");
+//        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as cnt from big_log group by level, month order by cnt desc").show();
+        System.out.println("\nOrdered by means of Spark API:");
+        spark.sql("select level, date_format(datetime, 'MMMM') as month, cast(first(date_format(datetime, 'M')) as int) as month_num, count(1) as cnt from big_log group by level, month")
+                .orderBy(functions.col("month_num"))
+                .orderBy(functions.col("level"))
+                .drop("month_num") // drop 'month_num' column from the results
+                .show(100);
 
 
 
