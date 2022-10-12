@@ -8,6 +8,7 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static org.apache.spark.sql.functions.*;
 
@@ -165,19 +166,40 @@ public class MainSparkSQL {
         /*
             Pure Java DataFrames / Datasets API
          */
-        System.out.println("\nDataFrames:");
+//        System.out.println("\nDataFrames:");
 //        bigLog.select("level", "date_format(datetime, 'M')").show(); // won't work
 //        bigLog.selectExpr("level", "date_format(datetime, 'MMMM') as month").show();
         bigLog = bigLog.select(col("level"), date_format(col("datetime"), "MMMM").as("month"), date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
 //        bigLog.show();
 
         // DataFrame grouping
-        System.out.println("\nDataFrames grouping:");
-        bigLog.groupBy(col("level"), col("month"), col("monthnum"))
-                .count()
-                .orderBy(col("monthnum"), col("level"))
-                .drop("monthnum")
-                .show();
+//        System.out.println("\nDataFrames grouping:");
+//        bigLog.groupBy(col("level"), col("month"), col("monthnum"))
+//                .count()
+//                .orderBy(col("monthnum"), col("level"))
+//                .drop("monthnum")
+//                .show();
+
+        /*
+            Pivot tables
+         */
+        System.out.println("\nPivot tables:");
+        // grouping by level and month
+//        bigLog.groupBy("level").pivot("month").count().show();
+        bigLog.groupBy("level").pivot("monthnum").count().show();
+
+        List<Object> columns = new ArrayList<>();
+        columns.add("March");
+        bigLog.groupBy("level").pivot("month", columns).count().show();
+
+        Object[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        bigLog.groupBy("level").pivot("month", Arrays.asList(months)).count().show();
+
+        // when nullable column of 'Auguuuust'
+        // using .na().fill(1) aka 'Not Available' and fill nulls with 0's
+        Object[] months2 = {"January", "February", "March", "April", "May", "June", "July", "August", "Auguuuust", "September", "October", "November", "December"};
+        bigLog.groupBy("level").pivot("month", Arrays.asList(months2)).count().na().fill(0).show();
+
 
 
         spark.close();

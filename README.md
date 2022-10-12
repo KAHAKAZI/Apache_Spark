@@ -9,11 +9,14 @@
 
 [Spark SQL, Built-in Functions](https://spark.apache.org/docs/latest/api/sql/index.html)
 
-[Static functions class and available methods](https://spark.apache.org/docs/1.5.0/api/java/org/apache/spark/sql/functions.html)
+[Static ' functions ' class and available methods](https://spark.apache.org/docs/1.5.0/api/java/org/apache/spark/sql/functions.html)
 
 [Class RelationalGroupedDataset - a set of methods for aggregations on a DataFrame, created by groupBy, cube or rollup (and also pivot)](https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/RelationalGroupedDataset.html)
 
 [Spark SQL, DataFrames and Datasets Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html)
+
+[Hive - LanguageManual](https://cwiki.apache.org/confluence/display/Hive/LanguageManual)
+* Hive is built on top of Apache Hadoop, used for querying data warehouses
 
 -------------------------------------------------------------
 ### Requirements:
@@ -82,7 +85,9 @@ ended at S11.28
 * Dataframe is a Dataset of rows.
 * DataFrames vs. Datasets: DataFrames relate to Datasets of rows but Datasets relate to datasets of anything
 
-
+#### Pivot table vs. Flat table
+* Pivot table is helpful when grouping on two separate columns, it gives more compact way of displaying results
+* Probably it's impossible to do pivot table directly from sql syntax
 
 -------------------------------------------------------------
 ### Abbreviations:
