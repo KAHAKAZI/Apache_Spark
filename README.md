@@ -89,6 +89,9 @@ ended at S11.28
 * Pivot table is helpful when grouping on two separate columns, it gives more compact way of displaying results
 * Probably it's impossible to do pivot table directly from sql syntax
 
+#### Aggregations
+
+
 -------------------------------------------------------------
 ### Abbreviations:
 * RDD Resilient Distributed Dataset
