@@ -30,7 +30,49 @@ public class ExamResults {
 //                max("score").as("max_score"),
 //                min("score").as("min_score")).show();
 
-        aggregationTask(dataset);
+//        aggregationTask(dataset);
+
+        // UserDefinedFunctions
+//        udf(dataset);
+
+        System.out.println("\nGrade A pass:");
+        /*
+            Registering the UDF named 'hasPassed'
+         */
+        spark.udf().register(
+                "hasPassed", // name
+                (String grade) -> // input
+                        grade.equals("A+"), // function
+                DataTypes.BooleanType // return type
+        );
+        /*
+            Using the previously defined UDF
+         */
+        dataset.withColumn("pass", callUDF("hasPassed", col("grade"))).show();
+
+        System.out.println("\nGrade A | B | C pass:");
+        spark.udf().register("hasPassed2", (String grade) -> {
+//            return grade.matches("\"A+\"|A|B|C"); // does not take 'A+' into account ??
+            return grade.startsWith("A") || grade.startsWith("B") || grade.startsWith("C");
+                },
+                DataTypes.BooleanType
+        );
+        dataset.withColumn("pass", callUDF("hasPassed2", col("grade"))).show();
+
+        System.out.println("\nBiology pass:");
+        spark.udf().register("hasPassed3", (String grade, String subject) -> {
+            if (subject.equals("Biology")) {
+                if (grade.startsWith("A"))
+                    return true;
+                return false;
+            }
+            return grade.startsWith("A") || grade.startsWith("B") || grade.startsWith("C");
+                },
+                DataTypes.BooleanType
+        );
+        dataset.withColumn("pass", callUDF("hasPassed3", col("grade"), col("subject")))
+                .filter(col("subject").equalTo("Biology"))
+                .show();
 
     }
 
@@ -47,6 +89,13 @@ public class ExamResults {
         dataset.groupBy("subject").pivot("year").agg(
                 round(avg("score"), 2).as("avg"),
                 round(stddev("score"), 2).as("stddev")).show();
+    }
+
+    private static void udf(Dataset<Row> dataset) {
+        // add new column 'pass' and fill the rows with 'YES'
+//        dataset.withColumn("pass", lit("YES")).show();
+
+        dataset.withColumn("pass", lit(col("grade").equalTo("A+"))).show();
     }
 
 }

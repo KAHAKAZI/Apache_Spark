@@ -91,6 +91,9 @@ ended at S11.28
 
 #### Aggregations
 
+#### UserDefinedFunctions
+* udf allows to add new columns which are calculated based on other columns
+* withColumn() allows to add a new column
 
 -------------------------------------------------------------
 ### Abbreviations:
