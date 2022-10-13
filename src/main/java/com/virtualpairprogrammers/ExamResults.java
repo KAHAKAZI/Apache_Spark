@@ -3,10 +3,27 @@ package com.virtualpairprogrammers;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.api.java.UDF2;
 import org.apache.spark.sql.types.DataTypes;
 import static org.apache.spark.sql.functions.*;
 
 public class ExamResults {
+
+    /**
+     * Old-fashioned java syntax of an anonymous in a class,
+     * can be used in java 1-7 if the lambda can not be used
+     */
+    private static UDF2<String, String, Boolean> hasPassedFunction = new UDF2<String, String, Boolean>() {
+        @Override
+        public Boolean call(String grade, String subject) throws Exception {
+            if (subject.equals("Biology")) {
+                if (grade.startsWith("A"))
+                    return true;
+                return false;
+            }
+            return grade.startsWith("A") || grade.startsWith("B") || grade.startsWith("C");
+        }
+    };
 
     public static void main(String[] args) {
         Logger.getLogger("org.apache").setLevel(Level.WARN);
@@ -71,6 +88,16 @@ public class ExamResults {
                 DataTypes.BooleanType
         );
         dataset.withColumn("pass", callUDF("hasPassed3", col("grade"), col("subject")))
+                .filter(col("subject").equalTo("Biology"))
+                .show();
+
+
+        /*
+            Using anonymous class as UDF instead of lambda - in case of java 1-7
+         */
+        System.out.println("\nBiology pass java 1-7 without lambda:");
+        spark.udf().register("hasPassedFunction", hasPassedFunction, DataTypes.BooleanType);
+        dataset.withColumn("pass", callUDF("hasPassedFunction", col("grade"), col("subject")))
                 .filter(col("subject").equalTo("Biology"))
                 .show();
 
