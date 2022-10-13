@@ -7,8 +7,10 @@ import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import static org.apache.spark.sql.functions.*;
 
@@ -180,10 +182,11 @@ public class MainSparkSQL {
 //                .drop("monthnum")
 //                .show();
 
+        //--------------------------------------------------------------------------------------------
         /*
             Pivot tables
          */
-        System.out.println("\nPivot tables:");
+//        System.out.println("\nPivot tables:");
         // grouping by level and month
 //        bigLog.groupBy("level").pivot("month").count().show();
         bigLog.groupBy("level").pivot("monthnum").count().show();
@@ -199,6 +202,33 @@ public class MainSparkSQL {
         // using .na().fill(1) aka 'Not Available' and fill nulls with 0's
         Object[] months2 = {"January", "February", "March", "April", "May", "June", "July", "August", "Auguuuust", "September", "October", "November", "December"};
         bigLog.groupBy("level").pivot("month", Arrays.asList(months2)).count().na().fill(0).show();
+
+
+        //--------------------------------------------------------------------------------------------
+        /*
+            UDF - definition
+         */
+        System.out.println("\nUDF - before:");
+        dataset1.show(); // dataset before UDF
+        SimpleDateFormat input = new SimpleDateFormat("MMMM");
+        SimpleDateFormat output = new SimpleDateFormat("M");
+        spark.udf().register("monthNum", (String month) -> {
+            Date inputDate = input.parse(month);
+            return Integer.parseInt(output.format(inputDate));
+            },
+                DataTypes.IntegerType
+                );
+
+        /*
+            Usage of UDF inside the SQL
+         */
+        System.out.println("\nUDF - after:");
+        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as total " +
+                "from logging_table " +
+                "group by level, month " +
+                "order by monthNum(month), level")
+                .show();
+
 
 
 
