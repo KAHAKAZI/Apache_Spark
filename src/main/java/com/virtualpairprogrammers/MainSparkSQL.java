@@ -188,7 +188,7 @@ public class MainSparkSQL {
 //        System.out.println("\nDataFrames:");
 //        bigLog.select("level", "date_format(datetime, 'M')").show(); // won't work
 //        bigLog.selectExpr("level", "date_format(datetime, 'MMMM') as month").show();
-        bigLog = bigLog.select(col("level"), date_format(col("datetime"), "MMMM").as("month"), date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
+//        bigLog = bigLog.select(col("level"), date_format(col("datetime"), "MMMM").as("month"), date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
 //        bigLog.show();
 
         // DataFrame grouping
@@ -253,26 +253,56 @@ public class MainSparkSQL {
          */
 //        bigLog = bigLog.select(col("level"),
 //                date_format(col("datetime"), "MMMM").as("month"),
-//                date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
+//                date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType))
+//                .groupBy("level", "month", "monthnum")
+//                .count()
+//                .as("total")
+//                .orderBy("monthnum")
+//                .drop("monthnum");
 
-        System.out.println("\nSpark SQL Performance");
-        bigLog.groupBy("level", "month", "monthnum")
-                .count()
-                .as("total")
-                .orderBy("monthnum")
-                .drop("monthnum")
-                .show(100);
+        bigLog = spark.sql(
+                "select level, date_format(datetime, 'MMMM') as month, count(1) as total " +
+                "from big_log " +
+                "group by level, month " +
+                "order by cast(first(date_format(datetime, 'M')) as int), level");
 
-        bigLog.explain();
+//        System.out.println("\nSpark SQL Performance");
+//        bigLog = bigLog.groupBy("level", "month", "monthnum")
+//                .count()
+//                .as("total")
+//                .orderBy("monthnum")
+//                .drop("monthnum");
 
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
+        bigLog.show(100);
+
+//        Scanner scanner = new Scanner(System.in);
+//        scanner.nextLine();
         /*
             Access Spark Web UI:
             Visit http://localhost:4040/jobs/ - Spark jobs
          */
 
 
+        /*
+            Hash Aggregation
+         */
+        // show execution plan
+        bigLog.explain();
+        /*
+            Execution plan of Spark SQL:
+
+            == Physical Plan ==
+            *(3) Project [level#74, month#78, total#79L]
+            +- *(3) Sort [aggOrder#82 ASC NULLS FIRST, level#74 ASC NULLS FIRST], true, 0
+               +- Exchange rangepartitioning(aggOrder#82 ASC NULLS FIRST, level#74 ASC NULLS FIRST, 12), ENSURE_REQUIREMENTS, [id=#120]
+                  +- SortAggregate(key=[level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#109], functions=[count(1), first(date_format(cast(datetime#75 as timestamp), M, Some(Europe/Warsaw)), false)])
+                     +- *(2) Sort [level#74 ASC NULLS FIRST, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#109 ASC NULLS FIRST], false, 0
+                        +- Exchange hashpartitioning(level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#109, 12), ENSURE_REQUIREMENTS, [id=#115]
+                           +- SortAggregate(key=[level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw)) AS date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#109], functions=[partial_count(1), partial_first(date_format(cast(datetime#75 as timestamp), M, Some(Europe/Warsaw)), false)])
+                              +- *(1) Sort [level#74 ASC NULLS FIRST, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw)) AS date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#109 ASC NULLS FIRST], false, 0
+                                 +- FileScan csv [level#74,datetime#75] Batched: false, DataFilters: [], Format: CSV, Location: InMemoryFileIndex[file:/home/christopher/java/Spark/src/main/resources/extras/biglog.txt], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<level:string,datetime:string>
+
+         */
 
 
         spark.close();
