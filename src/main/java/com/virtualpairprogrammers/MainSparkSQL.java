@@ -30,6 +30,16 @@ public class MainSparkSQL {
 
         SparkSession spark = SparkSession.builder().appName("testingSql").master("local[*]").getOrCreate();
 
+        /*
+            spark.sql.shuffle.partitions - Configures the number of partitions to use when shuffling data for joins or aggregations.
+            https://spark.apache.org/docs/latest/sql-performance-tuning.html
+            default values is : 200
+            The default number of partitions to use when shuffling data for joins or aggregations.
+            Note: For structured streaming, this configuration cannot be changed between query restarts from the same checkpoint location.
+            https://spark.apache.org/docs/latest/configuration.html
+         */
+        spark.conf().set("spark.sql.shuffle.partitions", "12");
+
 //        spark.read().csv("src/resources/exams/students.csv");
 
         /*
@@ -252,6 +262,8 @@ public class MainSparkSQL {
                 .orderBy("monthnum")
                 .drop("monthnum")
                 .show(100);
+
+        bigLog.explain();
 
         Scanner scanner = new Scanner(System.in);
         scanner.nextLine();

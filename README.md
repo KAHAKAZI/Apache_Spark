@@ -22,6 +22,10 @@
 
 [Spark Web UI](https://spark.apache.org/docs/latest/web-ui.html)
 
+[SparkSQL - Performance Tuning](https://spark.apache.org/docs/latest/sql-performance-tuning.html)
+
+[Spark Configuration](https://spark.apache.org/docs/latest/configuration.html)
+
 -------------------------------------------------------------
 ### Requirements:
 * JDK 8 ( no support for JDK 9 )
@@ -105,7 +109,10 @@ ended at S11.28
   * dataset.rdd();
   * dataset.javaRDD();
   ##### Spark Web UI : http://localhost:4040/jobs/
-
+* Spark SQL shuffle configuration
+  * The Spark SQL shuffle is a mechanism for redistributing or re-partitioning data so that the data is grouped differently across partitions, based on your data size you may need to reduce or increase the number of partitions of RDD/DataFrame using spark.sql.shuffle.partitions configuration or through code
+  * Spark shuffle is a very expensive operation as it moves the data between executors or even between worker nodes in a cluster so try to avoid it when possible. When you have a performance issue on Spark jobs, you should look at the Spark transformations that involve shuffling.
+  * [Spark SQL Shuffle Partitions](https://sparkbyexamples.com/spark/spark-shuffle-partitions/)
 
 -------------------------------------------------------------
 ### Abbreviations:
