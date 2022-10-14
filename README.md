@@ -149,6 +149,9 @@ ended at S11.28
 * Spark SQL vs. Java API ( DataFrames ) performance:
   * main difference between the two may comes from the ' HashAggregation vs GroupAggregation'
 
+#### Spark SQL performance vs. RDDs
+* SparkSQL is way more compact and friendly to work with in comparison to working with RDDs
+* In some cases RDDs may be slightly faster but are much more demanding to be coded
 
 -------------------------------------------------------------
 ### Abbreviations:
