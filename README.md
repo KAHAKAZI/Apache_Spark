@@ -2,6 +2,8 @@
 
 [Udemy - Spark for Java Developers](https://www.udemy.com/course/apache-spark-for-java-developers)
 
+### Documentation:
+
 [RDD Programming Guide](https://spark.apache.org/docs/latest/rdd-programming-guide.html)
 * Resilient Distributed Datasets (RDDs) -> RDD Operations
   * [Transformactions](https://spark.apache.org/docs/latest/rdd-programming-guide.html#transformations)
@@ -17,6 +19,8 @@
 
 [Hive - LanguageManual](https://cwiki.apache.org/confluence/display/Hive/LanguageManual)
 * Hive is built on top of Apache Hadoop, used for querying data warehouses
+
+[Spark Web UI](https://spark.apache.org/docs/latest/web-ui.html)
 
 -------------------------------------------------------------
 ### Requirements:
@@ -94,6 +98,14 @@ ended at S11.28
 #### UserDefinedFunctions
 * udf allows to add new columns which are calculated based on other columns
 * withColumn() allows to add a new column
+
+#### SparkSQL performance
+* underneath of Dataset / Dataframes are still RDDs
+* Dataset still can offer RDDs datatype by means of:
+  * dataset.rdd();
+  * dataset.javaRDD();
+  ##### Spark Web UI : http://localhost:4040/jobs/
+
 
 -------------------------------------------------------------
 ### Abbreviations:

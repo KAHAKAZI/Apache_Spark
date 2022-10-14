@@ -8,10 +8,8 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 import static org.apache.spark.sql.functions.*;
 
 public class MainSparkSQL {
@@ -19,6 +17,15 @@ public class MainSparkSQL {
     public static void main(String[] args) {
 
 //        System.setProperty("hadoop.home.dir", "c:/hadoop");
+
+        /*
+            Logs of INFO log level:
+                ...
+                INFO util.Utils: Successfully started service 'SparkUI' on port 4040.
+                ...
+                INFO ui.SparkUI: Bound SparkUI to 0.0.0.0, and started at http://10.0.2.15:4040
+         */
+//        Logger.getLogger("org.apache").setLevel(Level.INFO);
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
         SparkSession spark = SparkSession.builder().appName("testingSql").master("local[*]").getOrCreate();
@@ -189,27 +196,27 @@ public class MainSparkSQL {
 //        System.out.println("\nPivot tables:");
         // grouping by level and month
 //        bigLog.groupBy("level").pivot("month").count().show();
-        bigLog.groupBy("level").pivot("monthnum").count().show();
+//        bigLog.groupBy("level").pivot("monthnum").count().show();
 
         List<Object> columns = new ArrayList<>();
         columns.add("March");
-        bigLog.groupBy("level").pivot("month", columns).count().show();
+//        bigLog.groupBy("level").pivot("month", columns).count().show();
 
         Object[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        bigLog.groupBy("level").pivot("month", Arrays.asList(months)).count().show();
+//        bigLog.groupBy("level").pivot("month", Arrays.asList(months)).count().show();
 
         // when nullable column of 'Auguuuust'
         // using .na().fill(1) aka 'Not Available' and fill nulls with 0's
         Object[] months2 = {"January", "February", "March", "April", "May", "June", "July", "August", "Auguuuust", "September", "October", "November", "December"};
-        bigLog.groupBy("level").pivot("month", Arrays.asList(months2)).count().na().fill(0).show();
+//        bigLog.groupBy("level").pivot("month", Arrays.asList(months2)).count().na().fill(0).show();
 
 
         //--------------------------------------------------------------------------------------------
         /*
             UDF - definition
          */
-        System.out.println("\nUDF - before:");
-        dataset1.show(); // dataset before UDF
+//        System.out.println("\nUDF - before:");
+//        dataset1.show(); // dataset before UDF
         SimpleDateFormat input = new SimpleDateFormat("MMMM");
         SimpleDateFormat output = new SimpleDateFormat("M");
         spark.udf().register("monthNum", (String month) -> {
@@ -222,12 +229,36 @@ public class MainSparkSQL {
         /*
             Usage of UDF inside the SQL
          */
-        System.out.println("\nUDF - after:");
-        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as total " +
-                "from logging_table " +
-                "group by level, month " +
-                "order by monthNum(month), level")
-                .show();
+//        System.out.println("\nUDF - after:");
+//        spark.sql("select level, date_format(datetime, 'MMMM') as month, count(1) as total " +
+//                "from logging_table " +
+//                "group by level, month " +
+//                "order by monthNum(month), level")
+//                .show();
+
+
+        //--------------------------------------------------------------------------------------------
+        /*
+            SparkSQL Performance
+         */
+//        bigLog = bigLog.select(col("level"),
+//                date_format(col("datetime"), "MMMM").as("month"),
+//                date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType));
+
+        System.out.println("\nSpark SQL Performance");
+        bigLog.groupBy("level", "month", "monthnum")
+                .count()
+                .as("total")
+                .orderBy("monthnum")
+                .drop("monthnum")
+                .show(100);
+
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+        /*
+            Access Spark Web UI:
+            Visit http://localhost:4040/jobs/ - Spark jobs
+         */
 
 
 
