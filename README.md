@@ -113,6 +113,42 @@ ended at S11.28
   * The Spark SQL shuffle is a mechanism for redistributing or re-partitioning data so that the data is grouped differently across partitions, based on your data size you may need to reduce or increase the number of partitions of RDD/DataFrame using spark.sql.shuffle.partitions configuration or through code
   * Spark shuffle is a very expensive operation as it moves the data between executors or even between worker nodes in a cluster so try to avoid it when possible. When you have a performance issue on Spark jobs, you should look at the Spark transformations that involve shuffling.
   * [Spark SQL Shuffle Partitions](https://sparkbyexamples.com/spark/spark-shuffle-partitions/)
+* HashAggregation - more can be found about 'hashaggregate vs groupaggregate' in PostgreSQL documentation
+* Grouping strategies
+  * SparkSQL can use two algorithms for grouping
+    * SortAggregate - will sort the rows and then gather together the matching rows - O(n*log n) but memory efficient
+    * HashAggregate - O(n)
+      * faster than SortAggregate
+      * avoids the need for sorts at the cost of more memory
+      * SparkSQL will use HashAggregate where possible
+      * HashAggregation is only possible IF the data for the 'value' is mutable
+      * Spark HashMap / HashTable uses native memory in the opposition to HashMap from Java API, it's not stored in the regular Java Heap. It uses memory directly. No GC etc.
+      * An Unsafe implementation of Row which is backed by raw memory instead of Java objects - [UnsafeRow.java](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/java/org/apache/spark/sql/catalyst/expressions/UnsafeRow.java) - removed since Java 9
+      * Overwritable / Mutable data types from the [UnsafeRow.java](https://github.com/apache/spark/blob/master/sql/catalyst/src/main/java/org/apache/spark/sql/catalyst/expressions/UnsafeRow.java) class :
+```aidl
+// DecimalType, DayTimeIntervalType and YearMonthIntervalType are also mutable
+  static {
+    mutableFieldTypes = Collections.unmodifiableSet(
+      new HashSet<>(
+        Arrays.asList(
+          NullType,
+          BooleanType,
+          ByteType,
+          ShortType,
+          IntegerType,
+          LongType,
+          FloatType,
+          DoubleType,
+          DateType,
+          TimestampType,
+          TimestampNTZType
+        )));
+  }
+```
+* String in comparison to ex. Integer is immutable because it's size in the memory is not bounded
+* Spark SQL vs. Java API ( DataFrames ) performance:
+  * main difference between the two may comes from the ' HashAggregation vs GroupAggregation'
+
 
 -------------------------------------------------------------
 ### Abbreviations:

@@ -251,20 +251,24 @@ public class MainSparkSQL {
         /*
             SparkSQL Performance
          */
-        bigLog = bigLog.select(col("level"),
-                date_format(col("datetime"), "MMMM").as("month"),
-                date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType))
-                .groupBy("level", "month", "monthnum")
-                .count()
-                .as("total")
-                .orderBy("monthnum")
-                .drop("monthnum");
+//        bigLog = bigLog.select(col("level"),
+//                date_format(col("datetime"), "MMMM").as("month"),
+//                date_format(col("datetime"), "M").alias("monthnum").cast(DataTypes.IntegerType))
+//                .groupBy("level", "month", "monthnum")
+//                .count()
+//                .as("total")
+//                .orderBy("monthnum")
+//                .drop("monthnum");
 
-//        bigLog = spark.sql(
-//                "select level, date_format(datetime, 'MMMM') as month, count(1) as total " +
-//                "from big_log " +
-//                "group by level, month " +
-//                "order by cast(first(date_format(datetime, 'M')) as int), level");
+        /*
+            By 'first(cast(date_format(datetime, 'M') as int ))' the cast is done immediately from String to int to make the data mutable
+            It allows to use HashAggregation under the hood what dramatically improves the performance
+         */
+        bigLog = spark.sql(
+                "select level, date_format(datetime, 'MMMM') as month, count(1) as total, first(cast(date_format(datetime, 'M') as int )) as monthnum " +
+                "from big_log " +
+                "group by level, month " +
+                "order by monthnum, level");
 
 //        System.out.println("\nSpark SQL Performance");
 //        bigLog = bigLog.groupBy("level", "month", "monthnum")
@@ -314,6 +318,18 @@ public class MainSparkSQL {
                         +- *(1) HashAggregate(keys=[level#74, month#78, monthnum#80], functions=[partial_count(1)])
                            +- *(1) Project [level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw)) AS month#78, cast(date_format(cast(datetime#75 as timestamp), M, Some(Europe/Warsaw)) as int) AS monthnum#80]
                               +- FileScan csv [level#74,datetime#75] Batched: false, DataFilters: [], Format: CSV, Location: InMemoryFileIndex[file:/home/christopher/java/Spark/src/main/resources/extras/biglog.txt], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<level:string,datetime:string>
+
+
+            Execution plan for Spark SQL with forced HashAggregation:
+
+            == Physical Plan ==
+            *(3) Sort [monthnum#81 ASC NULLS FIRST, level#74 ASC NULLS FIRST], true, 0
+            +- Exchange rangepartitioning(monthnum#81 ASC NULLS FIRST, level#74 ASC NULLS FIRST, 12), ENSURE_REQUIREMENTS, [id=#103]
+               +- *(2) HashAggregate(keys=[level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#115], functions=[count(1), first(cast(date_format(cast(datetime#75 as timestamp), M, Some(Europe/Warsaw)) as int), false)])
+                  +- Exchange hashpartitioning(level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#115, 12), ENSURE_REQUIREMENTS, [id=#99]
+                     +- *(1) HashAggregate(keys=[level#74, date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw)) AS date_format(cast(datetime#75 as timestamp), MMMM, Some(Europe/Warsaw))#115], functions=[partial_count(1), partial_first(cast(date_format(cast(datetime#75 as timestamp), M, Some(Europe/Warsaw)) as int), false)])
+                        +- FileScan csv [level#74,datetime#75] Batched: false, DataFilters: [], Format: CSV, Location: InMemoryFileIndex[file:/home/christopher/java/Spark/src/main/resources/extras/biglog.txt], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<level:string,datetime:string>
+
          */
 
 
